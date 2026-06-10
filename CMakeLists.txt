@@ -7,6 +7,8 @@ endif()
 
 project ("BatLauncherWinService")
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 add_executable (BatLauncherWinService "BatLauncherWinService.cpp" "BatLauncherWinService.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

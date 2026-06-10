@@ -138,7 +138,11 @@ void pipeServer() {
 
     if (hPipe == INVALID_HANDLE_VALUE) return;
 
-    if (ConnectNamedPipe(hPipe, nullptr)) {
+    BOOL connected = ConnectNamedPipe(hPipe, nullptr)
+                         ? TRUE
+                         : (GetLastError() == ERROR_PIPE_CONNECTED);
+
+    if (connected) {
       std::thread(handleClient, hPipe).detach();
     } else {
       CloseHandle(hPipe);
@@ -161,6 +165,8 @@ void WINAPI ServiceMain(DWORD, LPWSTR *) {
 
   g_ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
   g_ServiceStatus.dwCurrentState = SERVICE_START_PENDING;
+  g_ServiceStatus.dwWaitHint = 10000;
+  g_ServiceStatus.dwCheckPoint = 1;
   SetServiceStatus(g_StatusHandle, &g_ServiceStatus);
 
   g_StopEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
